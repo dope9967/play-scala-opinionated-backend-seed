@@ -1,0 +1,18 @@
+@(elements: helper.FieldElements)
+
+<div class="field @if(elements.hasErrors) {error}">
+	<label for="@elements.id">@elements.label</label>
+	@elements.input
+	@if(elements.infos.nonEmpty) {
+		<div class="ui info message">
+			<div class="header">Info</div>
+			@elements.infos.mkString(", ")
+		</div>
+	}
+	@if(elements.hasErrors) {
+		<div class="ui error message">
+			<div class="header">Validation error</div>
+			@elements.errors.mkString(", ")
+		</div>
+	}
+</div>
