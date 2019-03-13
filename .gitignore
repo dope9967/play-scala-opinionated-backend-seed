@@ -1,7 +1,9 @@
 build
 logs
 target
-/.idea
+/.idea/*
+!/.idea/runConfigurations/
+!/.idea/codeStyles/
 /.idea_modules
 /.classpath
 /.gradle
