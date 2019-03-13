@@ -20,7 +20,7 @@ class PersonRepositorySpec extends PlaySpec
   override val container: PostgreSQLContainer = PostgreSQLContainer("postgres:alpine")
 
   override def newAppForTest(testData: TestData): Application = {
-    basicDatabaseTestApplication(container)
+    basicDatabaseTestApplication(container, evolutionsEnabled = false)
   }
 
   "PersonRepository" must {
