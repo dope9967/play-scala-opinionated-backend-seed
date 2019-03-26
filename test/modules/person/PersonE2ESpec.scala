@@ -44,12 +44,15 @@ class PersonE2ESpec extends PlaySpec
       click on id("submit")
 
       val repo = app.injector.instanceOf[PersonRepository]
-      val person = repo.find(1).futureValue.value
-      person mustEqual Person(
-        1,
-        "John",
-        34
-      )
+
+      eventually {
+        val person = repo.find(1).futureValue.value
+        person mustEqual Person(
+          1,
+          "John",
+          34
+        )
+      }
     }
   }
 }
