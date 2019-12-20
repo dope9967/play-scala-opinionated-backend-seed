@@ -10,6 +10,9 @@
       </value>
     </option>
     <option name="RIGHT_MARGIN" value="100" />
+    <MarkdownNavigatorCodeStyleSettings>
+      <option name="RIGHT_MARGIN" value="72" />
+    </MarkdownNavigatorCodeStyleSettings>
     <ScalaCodeStyleSettings>
       <option name="NOT_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
       <option name="USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS" value="true" />

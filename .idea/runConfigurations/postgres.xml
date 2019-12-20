@@ -17,7 +17,7 @@
             </DockerEnvVarImpl>
           </list>
         </option>
-        <option name="imageTag" value="postgres:alpine" />
+        <option name="imageTag" value="postgres:12.1-alpine" />
         <option name="portBindings">
           <list>
             <DockerPortBindingImpl>

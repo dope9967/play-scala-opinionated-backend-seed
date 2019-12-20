@@ -1,10 +1,9 @@
 package modules.person
 
-import com.dimafeng.testcontainers.PostgreSQLContainer
-import org.scalatest.{OptionValues, TestData}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerTest, PlaySpec}
+import org.scalatest.{OptionValues, TestData}
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
+import org.scalatestplus.play.{HtmlUnitFactory, OneBrowserPerTest, PlaySpec}
 import play.api.Application
 import utility.application.TestApplications.basicDatabaseTestApplication
 import utility.database.PlayPostgreSQLTest
@@ -17,8 +16,6 @@ class PersonE2ESpec extends PlaySpec
   with ScalaFutures
   with IntegrationPatience
   with OptionValues {
-
-  override val container: PostgreSQLContainer = PostgreSQLContainer("postgres:alpine")
 
   override def newAppForTest(testData: TestData): Application = {
     basicDatabaseTestApplication(container)

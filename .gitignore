@@ -4,6 +4,7 @@ target
 /.idea/*
 !/.idea/runConfigurations/
 !/.idea/codeStyles/
+!/.idea/play2_compiler_settings.xml
 /.idea_modules
 /.classpath
 /.gradle
