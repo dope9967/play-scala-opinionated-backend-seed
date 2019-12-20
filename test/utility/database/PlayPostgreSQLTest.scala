@@ -12,7 +12,7 @@ import scala.util.control.NonFatal
 
 trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContainer {
 
-  override val container: PostgreSQLContainer
+  override final val container: PostgreSQLContainer = PostgreSQLContainer("postgres:12.1-alpine")
 
   def applyEvolutions(): Unit = {
     lazy val databaseApi = app.injector.instanceOf[DBApi]

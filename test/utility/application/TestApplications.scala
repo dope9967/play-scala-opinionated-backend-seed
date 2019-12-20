@@ -1,11 +1,10 @@
 package utility.application
 
 import com.dimafeng.testcontainers.PostgreSQLContainer
-import org.scalatest.mockito.MockitoSugar
-import play.api.{Application, Configuration, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration, Mode}
 
-object TestApplications extends MockitoSugar {
+object TestApplications {
 
   def basicDatabaseTestApplication(
       container: PostgreSQLContainer,

@@ -1,6 +1,5 @@
 package modules.person
 
-import com.dimafeng.testcontainers.PostgreSQLContainer
 import org.scalatest.TestData
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.PlaySpec
@@ -16,8 +15,6 @@ class PersonRepositorySpec extends PlaySpec
   with PlayPostgreSQLTest
   with ScalaFutures
   with IntegrationPatience {
-
-  override val container: PostgreSQLContainer = PostgreSQLContainer("postgres:alpine")
 
   override def newAppForTest(testData: TestData): Application = {
     basicDatabaseTestApplication(container, evolutionsEnabled = false)
