@@ -8,7 +8,7 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PersonRepository @Inject()(
+class PersonRepository @Inject() (
     protected val dbConfigProvider: DatabaseConfigProvider
 )(
     implicit ec: ExecutionContext

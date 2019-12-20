@@ -21,18 +21,16 @@ trait ExtendedPostgresProfile
   override protected def computeCapabilities: Set[Capability] =
     super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
 
-  // format: off
-  override val api = new API 
-      with ArrayImplicits 
-      with DateTimeImplicits
-      with PlayJsonImplicits 
-      with NetImplicits
-      with LTreeImplicits
-      with RangeImplicits 
-      with HStoreImplicits 
-      with SearchImplicits
-      with SearchAssistants {}
-  // format: on
+  override val api = new API
+    with ArrayImplicits
+    with DateTimeImplicits
+    with PlayJsonImplicits
+    with NetImplicits
+    with LTreeImplicits
+    with RangeImplicits
+    with HStoreImplicits
+    with SearchImplicits
+    with SearchAssistants {}
 }
 
 object ExtendedPostgresProfile extends ExtendedPostgresProfile

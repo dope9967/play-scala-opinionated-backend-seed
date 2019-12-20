@@ -4,13 +4,12 @@ import javax.inject._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.libs.json.Json
 import play.api.mvc._
 import views.html
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PersonController @Inject()(
+class PersonController @Inject() (
     repo: PersonRepository,
     cc: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
