@@ -12,9 +12,9 @@ object TestApplications {
   ): Application = {
     val configuration: Configuration = Configuration.from(
       Seq(
-        Some("slick.dbs.default.profile" -> "modules.utility.database.ExtendedPostgresProfile$"),
-        Some("slick.dbs.default.db.url" -> container.jdbcUrl),
-        Some("slick.dbs.default.db.user" -> container.username),
+        Some("slick.dbs.default.profile"     -> "modules.utility.database.ExtendedPostgresProfile$"),
+        Some("slick.dbs.default.db.url"      -> container.jdbcUrl),
+        Some("slick.dbs.default.db.user"     -> container.username),
         Some("slick.dbs.default.db.password" -> container.password),
         if (!evolutionsEnabled) {
           Some("play.evolutions.db.default.enabled" -> "false")
