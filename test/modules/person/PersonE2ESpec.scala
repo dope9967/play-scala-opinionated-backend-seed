@@ -8,14 +8,15 @@ import play.api.Application
 import utility.application.TestApplications.basicDatabaseTestApplication
 import utility.database.PlayPostgreSQLTest
 
-class PersonE2ESpec extends PlaySpec
-  with GuiceOneServerPerTest
-  with OneBrowserPerTest
-  with HtmlUnitFactory
-  with PlayPostgreSQLTest
-  with ScalaFutures
-  with IntegrationPatience
-  with OptionValues {
+class PersonE2ESpec
+    extends PlaySpec
+    with GuiceOneServerPerTest
+    with OneBrowserPerTest
+    with HtmlUnitFactory
+    with PlayPostgreSQLTest
+    with ScalaFutures
+    with IntegrationPatience
+    with OptionValues {
 
   override def newAppForTest(testData: TestData): Application = {
     basicDatabaseTestApplication(container)
@@ -24,7 +25,8 @@ class PersonE2ESpec extends PlaySpec
   "Person form" must {
     "create person" in {
       {
-        val url = s"http://localhost:$port${modules.person.routes.PersonController.createView().url}"
+        val url =
+          s"http://localhost:$port${modules.person.routes.PersonController.createView().url}"
         go to url
       }
 

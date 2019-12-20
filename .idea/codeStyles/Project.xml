@@ -15,6 +15,8 @@
     </MarkdownNavigatorCodeStyleSettings>
     <ScalaCodeStyleSettings>
       <option name="NOT_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
+      <option name="SCALAFMT_REFORMAT_ON_FILES_SAVE" value="true" />
+      <option name="FORMATTER" value="1" />
       <option name="USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
       <option name="CALL_PARAMETERS_NEW_LINE_AFTER_LPAREN" value="2" />
     </ScalaCodeStyleSettings>

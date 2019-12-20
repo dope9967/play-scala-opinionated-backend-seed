@@ -16,7 +16,7 @@ trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContaine
 
   def applyEvolutions(): Unit = {
     lazy val databaseApi = app.injector.instanceOf[DBApi]
-    val database = databaseApi.database("default")
+    val database         = databaseApi.database("default")
     try {
       Evolutions.applyEvolutions(database)
       database.shutdown()
@@ -29,7 +29,7 @@ trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContaine
 
   def unapplyEvolutions(): Unit = {
     lazy val databaseApi = app.injector.instanceOf[DBApi]
-    val database = databaseApi.database("default")
+    val database         = databaseApi.database("default")
     try {
       Evolutions.cleanupEvolutions(database)
       database.shutdown()
@@ -55,10 +55,9 @@ trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContaine
     applyEvolutions()
     futureAssertionFun
       .apply()
-      .map {
-        assertion =>
-          unapplyEvolutions()
-          assertion
+      .map { assertion =>
+        unapplyEvolutions()
+        assertion
       }
   }
 }

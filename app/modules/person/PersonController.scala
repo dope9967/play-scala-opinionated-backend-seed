@@ -13,12 +13,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class PersonController @Inject()(
     repo: PersonRepository,
     cc: MessagesControllerComponents
-)(implicit ec: ExecutionContext) extends MessagesAbstractController(cc) {
+)(implicit ec: ExecutionContext)
+    extends MessagesAbstractController(cc) {
 
   val personForm: Form[CreatePersonForm] = Form {
     mapping(
       "name" -> nonEmptyText,
-      "age" -> number.verifying(min(0), max(140))
+      "age"  -> number.verifying(min(0), max(140))
     )(CreatePersonForm.apply)(CreatePersonForm.unapply)
   }
 

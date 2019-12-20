@@ -12,7 +12,8 @@ class PersonRepository @Inject()(
     protected val dbConfigProvider: DatabaseConfigProvider
 )(
     implicit ec: ExecutionContext
-) extends PersonTableComponent with HasDatabaseConfigProvider[ExtendedPostgresProfile] {
+) extends PersonTableComponent
+    with HasDatabaseConfigProvider[ExtendedPostgresProfile] {
   import profile.api._
 
   private val logger = Logger(this.getClass)
@@ -28,8 +29,7 @@ class PersonRepository @Inject()(
   def create(name: String, age: Int): Future[Person] = db.run {
     (persons.map(p => (p.name, p.age))
       returning persons.map(_.id)
-      into ((nameAge, id) => Person(id, nameAge._1, nameAge._2))
-      ) += (name, age)
+      into ((nameAge, id) => Person(id, nameAge._1, nameAge._2))) += (name, age)
   }
 
   def save(person: Person): Future[Person] = {

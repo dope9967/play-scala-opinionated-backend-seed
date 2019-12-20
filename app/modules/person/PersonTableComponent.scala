@@ -8,9 +8,9 @@ trait PersonTableComponent { self: HasDatabaseConfig[ExtendedPostgresProfile] =>
 
   class PersonTable(tag: Tag) extends Table[Person](tag, "persons") {
 
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def id   = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
-    def age = column[Int]("age")
+    def age  = column[Int]("age")
 
     def * = (id, name, age) <> ((Person.apply _).tupled, Person.unapply)
   }
