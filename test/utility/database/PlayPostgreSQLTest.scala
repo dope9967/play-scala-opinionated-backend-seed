@@ -12,11 +12,11 @@ import scala.util.control.NonFatal
 
 trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContainer {
 
-  override val container: PostgreSQLContainer
+  override final val container: PostgreSQLContainer = PostgreSQLContainer("postgres:12.1-alpine")
 
   def applyEvolutions(): Unit = {
     lazy val databaseApi = app.injector.instanceOf[DBApi]
-    val database = databaseApi.database("default")
+    val database         = databaseApi.database("default")
     try {
       Evolutions.applyEvolutions(database)
       database.shutdown()
@@ -29,7 +29,7 @@ trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContaine
 
   def unapplyEvolutions(): Unit = {
     lazy val databaseApi = app.injector.instanceOf[DBApi]
-    val database = databaseApi.database("default")
+    val database         = databaseApi.database("default")
     try {
       Evolutions.cleanupEvolutions(database)
       database.shutdown()
@@ -55,10 +55,9 @@ trait PlayPostgreSQLTest extends Suite with AppProvider with ForEachTestContaine
     applyEvolutions()
     futureAssertionFun
       .apply()
-      .map {
-        assertion =>
-          unapplyEvolutions()
-          assertion
+      .map { assertion =>
+        unapplyEvolutions()
+        assertion
       }
   }
 }
