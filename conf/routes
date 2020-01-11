@@ -3,7 +3,17 @@
 # ~~~~
 
 # Home page
-GET     /                           modules.person.PersonController.index
+GET     /                           modules.auth.AuthController.index
+
+GET     /signup                     modules.auth.AuthController.signUpView()
+POST    /signup                     modules.auth.AuthController.signUp()
+
+GET     /login                      modules.auth.AuthController.loginView()
+POST    /login                      modules.auth.AuthController.login()
+GET     /logout                     modules.auth.AuthController.logout()
+
+GET     /unauthorized               modules.auth.AuthController.unauthorized()
+
 GET     /persons                    modules.person.PersonController.list
 GET     /person                     modules.person.PersonController.createView
 POST    /person                     modules.person.PersonController.create

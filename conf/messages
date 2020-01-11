@@ -1,4 +1,50 @@
 name = Name
 age = Age
 
-user.created = You have successfully created a user!
+login=Login
+logout=Logout
+signup=Sign up
+first=First
+previous=Previous
+next=Next
+last=Last
+displaying=Displaying
+edit=Edit
+delete=Delete
+submit=Submit
+yes=Yes
+no=No
+
+success=Success
+error=Error
+error.invalid.credentials=Invalid credentials
+error.access.denied.title=Access denied
+error.access.denied.message=Access to url was denied. Check you permissions.
+
+validation.error.title.unique=Title must be unique
+validation.error.username.unique=Username must be unique
+validation.error.email.unique=Email must be unique
+validation.error.role.invalid=Role must be valid
+validation.error.password.required=Password is required
+validation.error.password.match.confirm=Password does not match confirm
+validation.error.password.confirm.required=Password confirm is required
+
+role=Role
+create.user=Create user
+update.user=Last update user
+create.time=Create time
+update.time=Last update time
+
+user.plural=Users
+user.singular=User
+user.username=Username
+user.firstname=First name
+user.lastname=Last name
+user.email=Email
+user.password=Password
+user.password.confirm=Password confirm
+user.create=Create user
+user.created=User created
+user.deleted=User deleted
+
+signup.success=Sign up successful, can login now

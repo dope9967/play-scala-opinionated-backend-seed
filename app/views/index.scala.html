@@ -1,7 +1,7 @@
-@import helper._
-@import modules.person.CreatePersonForm
-@()(implicit request: MessagesRequestHeader)
+@import modules.utility.twirl.CustomHelpers.AppName
+@import modules.auth.AuthorizedUser
+@()(implicit request: RequestHeader, messages: Messages, authorizedUserOption: Option[AuthorizedUser])
 
-@main("Index") {
+@layout.main(AppName) {
 	Index
 }

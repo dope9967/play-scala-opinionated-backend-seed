@@ -1,0 +1,102 @@
+@import modules.auth.AuthorizedUser
+
+@(
+    title: String,
+	enableMenu: Boolean = true
+)(
+    content: Html
+)(implicit request: RequestHeader, messages: Messages, authorizedUserOption: Option[AuthorizedUser])
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+    
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css"
+            integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY="
+            crossorigin="anonymous"
+        />
+    
+        <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
+        <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+    </head>
+    <body>
+        @if(enableMenu) {
+            <div class="ui container">
+                <div class="ui menu">
+                    <a
+                        class="header item"
+                        href="@modules.auth.routes.AuthController.index()"
+                    >
+	                    play-scala-opinionated-backend-seed
+                    </a>
+	                @*
+                    @authorizedUserOption match {
+                        case Some(authorizedUser) if authorizedUser.user.role == Role.ADMINISTRATOR => {
+                            <div class="ui simple dropdown item">
+                                @Messages("menu.administration")
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <a
+                                        class="item"
+                                        href="@modules.user.routes.UserController.listView()"
+                                    >
+                                        @Messages("user.plural")
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        case _ => {}
+                    }
+	                *@
+                    <div class="right menu">
+                        @authorizedUserOption.map { authorizedUser =>
+                            <a
+                                class="item"
+                                href="#"
+                            >
+                                @authorizedUser.user.username
+                            </a>
+                        }
+                        @if(authorizedUserOption.nonEmpty) {
+                            <a
+                                class="item"
+                                href="@modules.auth.routes.AuthController.logout()"
+                            >
+                            @Messages("logout")
+                            </a>
+                        } else {
+                            <a
+                                class="item"
+                                href="@modules.auth.routes.AuthController.signUpView()"
+                            >
+                                @Messages("signup")
+                            </a>
+                            <a
+                                class="item"
+                                href="@modules.auth.routes.AuthController.loginView()"
+                            >
+                                @Messages("login")
+                            </a>
+                        }
+                    </div>
+                </div>
+                
+                <div class="ui stackable grid">
+                    @content
+                </div>
+            </div>
+        } else {
+            @content
+        }
+    </body>
+</html>

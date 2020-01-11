@@ -1,6 +1,7 @@
 package modules.person
 
 import javax.inject._
+import modules.auth.AuthorizedUser
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
@@ -23,6 +24,7 @@ class PersonController @Inject() (
   }
 
   def index: Action[AnyContent] = Action { implicit request =>
+    implicit val authorizedUserOption: Option[AuthorizedUser] = Option.empty
     Ok(html.index())
   }
 

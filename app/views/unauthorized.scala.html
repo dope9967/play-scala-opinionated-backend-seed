@@ -1,0 +1,18 @@
+@import modules.utility.twirl.CustomHelpers.AppName
+@import modules.auth.AuthorizedUser
+@()(implicit request: RequestHeader, messages: Messages, authorizedUserOption: Option[AuthorizedUser])
+
+@layout.main(AppName) {
+	<div class="row">
+		<div class="column">
+			<div class="ui negative message">
+				<div class="header">
+					@Messages("error.access.denied.title")
+				</div>
+				<p>
+					@Messages("error.access.denied.message")
+				</p>
+			</div>
+		</div>
+	</div>
+}
