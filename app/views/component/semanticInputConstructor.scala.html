@@ -1,0 +1,25 @@
+@(fieldElement: helper.FieldElements)(implicit messages: play.api.i18n.Messages)
+
+<div class="field @if(fieldElement.hasErrors) {error}">
+	@if(fieldElement.args.getOrElse('showLabel, true).equals(true)){
+		<label for="@fieldElement.id">
+			@Messages(fieldElement.label.toString)
+		</label>
+	}
+	<div class="input">
+		@fieldElement.input
+	</div>
+	@if(fieldElement.hasErrors) {
+		@if(fieldElement.args.getOrElse('showFullErrors, true).equals(true)){
+			<div class="ui red pointing above ui label">
+				@fieldElement.field.errors.map(formError => {
+					Messages(formError.message)
+				}).mkString("", ". ", ".")
+			</div>
+		} else {
+			<div class="ui red pointing above ui label">
+				@Messages("error.prepend")
+			</div>
+		}
+	}
+</div>

@@ -31,6 +31,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "com.iheart" %% "ficus" % "1.4.3"
 
+libraryDependencies += "net.codingwell" %% "scala-guice" % "4.1.0"
+
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test
 
 libraryDependencies += "com.dimafeng"       %% "testcontainers-scala" % "0.27.0" % Test

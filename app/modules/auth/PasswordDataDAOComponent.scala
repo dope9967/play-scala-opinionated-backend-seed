@@ -18,9 +18,8 @@ trait PasswordDataDAOComponent extends CustomDatabaseTypes {
     def providerID  = column[String]("provider_id")
     def providerKey = column[String]("provider_key")
     def hasher      = column[String]("hasher")
-    def password    = column[String]("hasher")
+    def password    = column[String]("password")
     def salt        = column[Option[String]]("salt")
-    def userId      = column[UUID]("user_id")
 
     def pk = primaryKey("password_data_pk", (providerID, providerKey))
 

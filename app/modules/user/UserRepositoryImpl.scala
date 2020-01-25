@@ -24,11 +24,11 @@ class UserRepositoryImpl @Inject() (
       .join(passwordDataTable)
       .on {
         case (ut, pdt) =>
-          ut.id === pdt.userId
+          ut.email === pdt.providerKey
       }
       .filter {
         case (_, pdt) =>
-          pdt.providerKey === loginInfo.providerKey && pdt.providerKey === loginInfo.providerID
+          pdt.providerKey === loginInfo.providerKey && pdt.providerID === loginInfo.providerID
       }
       .map {
         case (ut, _) =>

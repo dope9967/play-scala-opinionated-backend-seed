@@ -22,7 +22,7 @@ class PasswordInfoDAO @Inject() (
   override def find(loginInfo: LoginInfo): Future[Option[PasswordInfo]] = {
     val query = passwordDataTable
       .filter { pdt =>
-        pdt.providerKey === loginInfo.providerKey && pdt.providerKey === loginInfo.providerID
+        pdt.providerKey === loginInfo.providerKey && pdt.providerID === loginInfo.providerID
       }
     db.run(query.result.headOption)
       .map {

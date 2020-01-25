@@ -1,7 +1,7 @@
 package modules.auth
 
-import com.google.inject.Provides
 import com.google.inject.name.Named
+import com.google.inject.{AbstractModule, Provides}
 import com.mohiva.play.silhouette.api.actions.{SecuredErrorHandler, UnsecuredErrorHandler}
 import com.mohiva.play.silhouette.api.crypto.{Crypter, CrypterAuthenticatorEncoder, Signer}
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
@@ -28,9 +28,9 @@ import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import net.ceedubs.ficus.readers.ValueReader
-import play.api
+import net.codingwell.scalaguice.ScalaModule
 import play.api.Configuration
-import play.api.inject.{Binding, Module}
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Cookie, CookieHeaderEncoding}
 
@@ -39,25 +39,25 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * The Guice module which wires all Silhouette dependencies.
   */
-class SilhouetteModule extends Module {
+class SilhouetteModule extends AbstractModule with ScalaModule {
+  import SilhouetteModule._
 
-  override def bindings(
-      environment: api.Environment,
-      configuration: Configuration
-  ): Seq[Binding[_]] = {
-    Seq(
-      bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]],
-      bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler],
-      bind[SecuredErrorHandler].to[CustomSecuredErrorHandler],
-      bind[IdentityService[AuthorizedUser]].to[UserAuthService],
-      bind[IDGenerator].toInstance(new SecureRandomIDGenerator()),
-      bind[FingerprintGenerator]
-        .toInstance(new DefaultFingerprintGenerator(includeRemoteAddress = false)),
-      bind[EventBus].toInstance(EventBus()),
-      bind[Clock].toInstance(Clock()),
-      bind[DelegableAuthInfoDAO[PasswordInfo]].to[PasswordInfoDAO]
-    )
+  override def configure() {
+    bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
+    bind[UnsecuredErrorHandler].to[CustomUnsecuredErrorHandler]
+    bind[SecuredErrorHandler].to[CustomSecuredErrorHandler]
+    bind[IdentityService[AuthorizedUser]].to[UserAuthService]
+    bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
+    bind[FingerprintGenerator]
+      .toInstance(new DefaultFingerprintGenerator(includeRemoteAddress = false))
+    bind[EventBus].toInstance(EventBus())
+    bind[Clock].toInstance(Clock())
   }
+
+  @Provides
+  def providePasswordDAO(
+      dbConfigProvider: DatabaseConfigProvider
+  ): DelegableAuthInfoDAO[PasswordInfo] = new PasswordInfoDAO(dbConfigProvider)
 
   /**
     * Provides the HTTP layer implementation.
@@ -153,7 +153,6 @@ class SilhouetteModule extends Module {
       configuration: Configuration,
       clock: Clock
   ): AuthenticatorService[CookieAuthenticator] = {
-    import SilhouetteModule._
     val config =
       configuration.underlying.as[CookieAuthenticatorSettings]("silhouette.authenticator")
     val authenticatorEncoder = new CrypterAuthenticatorEncoder(crypter)
