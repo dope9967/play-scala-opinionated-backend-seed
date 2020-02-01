@@ -10,6 +10,8 @@ resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
 libraryDependencies += guice
 
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
+
 libraryDependencies += "org.postgresql" % "postgresql" % "42.2.9"
 
 val playSlickVersion = "4.0.2"
@@ -43,5 +45,6 @@ libraryDependencies += specs2 % Test
 scalacOptions ++= Seq(
   "-feature",
   "-deprecation",
-  "-Xfatal-warnings"
+  "-Xfatal-warnings",
+  "-Ypartial-unification"
 )

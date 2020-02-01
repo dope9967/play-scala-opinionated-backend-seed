@@ -20,6 +20,8 @@ import com.mohiva.play.silhouette.impl.authenticators.{
   CookieAuthenticatorSettings
 }
 import com.mohiva.play.silhouette.impl.providers._
+import com.mohiva.play.silhouette.impl.providers.oauth2.{FacebookProvider, GoogleProvider}
+import com.mohiva.play.silhouette.impl.providers.state.{CsrfStateItemHandler, CsrfStateSettings}
 import com.mohiva.play.silhouette.impl.util.{DefaultFingerprintGenerator, SecureRandomIDGenerator}
 import com.mohiva.play.silhouette.password.{BCryptPasswordHasher, BCryptSha256PasswordHasher}
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
@@ -59,6 +61,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       dbConfigProvider: DatabaseConfigProvider
   ): DelegableAuthInfoDAO[PasswordInfo] = new PasswordInfoDAO(dbConfigProvider)
 
+  @Provides
+  def provideOAuth2DAO(
+      dbConfigProvider: DatabaseConfigProvider
+  ): DelegableAuthInfoDAO[OAuth2Info] = new OAuth2InfoDAO(dbConfigProvider)
+
   /**
     * Provides the HTTP layer implementation.
     *
@@ -89,6 +96,35 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       Seq(),
       eventBus
     )
+  }
+
+  @Provides
+  def provideSocialProviderRegistry(
+      facebookProvider: FacebookProvider,
+      googleProvider: GoogleProvider
+  ): SocialProviderRegistry = {
+    SocialProviderRegistry(
+      Seq(
+        googleProvider,
+        facebookProvider
+      )
+    )
+  }
+
+  @Provides @Named("csrf-state-item-signer")
+  def provideCSRFStateItemSigner(configuration: Configuration): Signer = {
+    val config =
+      configuration.underlying.as[JcaSignerSettings]("silhouette.csrfStateItemHandler.signer")
+
+    new JcaSigner(config)
+  }
+
+  @Provides @Named("social-state-signer")
+  def provideSocialStateSigner(configuration: Configuration): Signer = {
+    val config =
+      configuration.underlying.as[JcaSignerSettings]("silhouette.socialStateHandler.signer")
+
+    new JcaSigner(config)
   }
 
   /**
@@ -125,10 +161,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     */
   @Provides
   def provideAuthInfoRepository(
-      passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo]
+      passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
+      oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info]
   ): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth2InfoDAO)
   }
 
   /**
@@ -169,6 +206,24 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     )
   }
 
+  @Provides
+  def provideCsrfStateItemHandler(
+      idGenerator: IDGenerator,
+      @Named("csrf-state-item-signer") signer: Signer,
+      configuration: Configuration
+  ): CsrfStateItemHandler = {
+    val settings = configuration.underlying.as[CsrfStateSettings]("silhouette.csrfStateItemHandler")
+    new CsrfStateItemHandler(settings, idGenerator, signer)
+  }
+
+  @Provides
+  def provideSocialStateHandler(
+      @Named("social-state-signer") signer: Signer,
+      csrfStateItemHandler: CsrfStateItemHandler
+  ): SocialStateHandler = {
+    new DefaultSocialStateHandler(Set(csrfStateItemHandler), signer)
+  }
+
   /**
     * Provides the password hasher registry.
     *
@@ -193,6 +248,50 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   ): CredentialsProvider = {
 
     new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
+  }
+
+  /**
+    * Provides the Facebook provider.
+    *
+    * @param httpLayer The HTTP layer implementation.
+    * @param socialStateHandler The social state handler implementation.
+    * @param configuration The Play configuration.
+    * @return The Facebook provider.
+    */
+  @Provides
+  def provideFacebookProvider(
+      httpLayer: HTTPLayer,
+      socialStateHandler: SocialStateHandler,
+      configuration: Configuration
+  ): FacebookProvider = {
+
+    new FacebookProvider(
+      httpLayer,
+      socialStateHandler,
+      configuration.underlying.as[OAuth2Settings]("silhouette.facebook")
+    )
+  }
+
+  /**
+    * Provides the Google provider.
+    *
+    * @param httpLayer The HTTP layer implementation.
+    * @param socialStateHandler The social state handler implementation.
+    * @param configuration The Play configuration.
+    * @return The Google provider.
+    */
+  @Provides
+  def provideGoogleProvider(
+      httpLayer: HTTPLayer,
+      socialStateHandler: SocialStateHandler,
+      configuration: Configuration
+  ): GoogleProvider = {
+
+    new GoogleProvider(
+      httpLayer,
+      socialStateHandler,
+      configuration.underlying.as[OAuth2Settings]("silhouette.google")
+    )
   }
 }
 

@@ -48,3 +48,6 @@ user.created=User created
 user.deleted=User deleted
 
 signup.success=Sign up successful, can login now
+
+or.use.social=Or use your existing account on one of the following services to sign in:
+could.not.authenticate = Could not authenticate with social provider! Please try again!

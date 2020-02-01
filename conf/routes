@@ -12,6 +12,8 @@ GET     /login                      modules.auth.AuthController.loginView()
 POST    /login                      modules.auth.AuthController.login()
 GET     /logout                     modules.auth.AuthController.logout()
 
+GET     /authenticate/:provider     modules.auth.AuthController.authenticate(provider)
+
 GET     /unauthorized               modules.auth.AuthController.unauthorized()
 
 GET     /persons                    modules.person.PersonController.list
