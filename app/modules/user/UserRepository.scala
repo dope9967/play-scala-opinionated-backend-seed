@@ -11,6 +11,8 @@ trait UserRepository {
 
   def findByEmail(email: String): Future[Option[User]]
 
+  def findByUsername(username: String): Future[Option[User]]
+
   def add(user: User): Future[User]
 
   def add(email: String, profile: CommonSocialProfile): Future[User]

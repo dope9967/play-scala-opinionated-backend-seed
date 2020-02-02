@@ -101,14 +101,14 @@ class AuthController @Inject() (
 
   def signUpView: Action[AnyContent] = silhouette.UnsecuredAction {
     implicit request: Request[AnyContent] =>
-      Ok(views.html.signup(forms.signUpForm))
+      Ok(views.html.signup(forms.signUpForm.form))
   }
 
   def signUp(): Action[AnyContent] = silhouette.UnsecuredAction.async {
     implicit request: Request[AnyContent] =>
       forms.signUpForm
         .bindFromRequest()
-        .fold(
+        .foldAsync(
           formWithErrors => {
             Future.successful(BadRequest(views.html.signup(formWithErrors)))
           },

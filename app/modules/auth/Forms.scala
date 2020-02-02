@@ -7,12 +7,16 @@ import javax.inject.Inject
 import modules.auth.Forms._
 import modules.user.{Role, User, UserRepository}
 import modules.utility.FormValidators
-import play.api.data.Form
+import play.api.data.{Form, FormError}
 import play.api.data.Forms._
+import modules.utility.form.FormUtilities._
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class Forms @Inject() (
     userRepository: UserRepository
-) extends FormValidators {
+)(implicit ec: ExecutionContext)
+    extends FormValidators {
 
   val loginForm = Form(
     mapping(
@@ -23,24 +27,54 @@ class Forms @Inject() (
 
   val signUpForm = Form(
     mapping(
-      "username" -> nonEmptyText,
-      //TODO implement proper async forms extension
-//      .verifying(
-//        "validation.error.username.unique",
-//        value => Await.result(userRepository.checkUsernameUnique(value), 10.seconds)
-//      )
-      "email" -> email,
-      //TODO implement proper async forms extension
-//      .verifying(
-//        "validation.error.email.unique",
-//        value => Await.result(userRepository.checkUsernameUnique(value), 10.seconds)
-//      )
+      "username"         -> nonEmptyText,
+      "email"            -> email,
       "password"         -> of(passwordFormatterWithValidator),
       "password-confirm" -> nonEmptyText
     )((username, email, password, _) => SignUpFormModel(username, email, password))(sufm =>
       Some(sufm.username, sufm.email, sufm.password, "")
     )
-  )
+  ).withAsyncValidator { (form, model) =>
+    Future
+      .sequence(
+        Seq(
+          {
+            userRepository
+              .findByUsername(model.username)
+              .map {
+                case Some(_) =>
+                  Some("username" -> "validation.error.username.unique")
+                case _ =>
+                  None
+              }
+          }, {
+            userRepository
+              .findByEmail(model.email)
+              .map {
+                case Some(_) =>
+                  Some("email" -> "validation.error.email.unique")
+                case _ =>
+                  None
+              }
+          }
+        )
+      )
+      .map(_.flatten)
+      .map {
+        case asyncErrors if asyncErrors.nonEmpty =>
+          form.copy(
+            errors = asyncErrors.map {
+              case (key, error) =>
+                FormError(
+                  key,
+                  error
+                )
+            }
+          )
+        case _ =>
+          form
+      }
+  }
 }
 
 object Forms {
