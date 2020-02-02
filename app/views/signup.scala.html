@@ -1,0 +1,32 @@
+@import helper._
+@import modules.auth.Forms.SignUpFormModel
+@import modules.utility.twirl.CustomHelpers.AppName
+@(form: Form[SignUpFormModel])(implicit request: RequestHeader, messages: Messages)
+
+@implicitFieldConstructor = @{ helper.FieldConstructor(component.semanticInputConstructor.f(_)(implicitly[play.api.i18n.Messages])) }
+
+@content(implicit fieldConstructor: FieldConstructor) = {
+	<div class="ui middle aligned center aligned grid" style="height:100%;">
+		<div class="left aligned column" style="max-width: 450px;">
+			<h2 class="ui center aligned header">@Messages("signup").capitalize</h2>
+			
+			@helper.form(action = modules.auth.routes.AuthController.signUp(), 'class -> "ui large form") {
+				@inputText(form("username"), 'placeholder -> Messages("user.username"), '_label -> "user.username")
+				@inputText(form("email"), 'placeholder -> Messages("user.email"), '_label -> "user.email")
+				@inputPassword(form("password"), 'placeholder -> Messages("user.password"), '_label -> "user.password")
+				@inputPassword(form("password-confirm"), 'placeholder -> Messages("user.password.confirm"), '_label -> "user.password.confirm")
+				<input class="ui fluid large submit button" type="submit"  value="@Messages("signup")">
+			}
+			@request.flash.get("error").map { msg =>
+				<div class="ui error message">
+					<div class="header">
+						@messages("error")
+					</div>
+					@messages(msg)
+				</div>
+			}
+		</div>
+	</div>
+}
+
+@layout.main(AppName, enableMenu = false)(content)(request, messages, None)
