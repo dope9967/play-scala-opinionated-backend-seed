@@ -1,42 +1,61 @@
 package modules.utility.form
 
-import play.api.data.Form
+import play.api.data.{Form, FormError}
+import play.api.mvc.Request
 
 import scala.concurrent.{ExecutionContext, Future}
 
 object FormUtilities {
 
-  implicit class FormExtensions[T](form: Form[T]) {
-    def withAsyncValidator(
-        asyncValidator: (Form[T], T) => Future[Form[T]]
-    ): FormWithAsyncValidator[T] = {
-      FormWithAsyncValidator(form, asyncValidator)
-    }
-  }
+  trait WithAsyncValidator[T] extends Form[T] {
 
-  case class FormWithAsyncValidator[T](
-      form: Form[T],
-      asyncValidator: (Form[T], T) => Future[Form[T]]
-  ) {
+    def asyncValidator(value: T)(implicit ec: ExecutionContext): Map[String, Future[Option[String]]]
 
-    def bindFromRequest()(implicit request: play.api.mvc.Request[_]): FormWithAsyncValidator[T] = {
-      FormWithAsyncValidator(form.bindFromRequest(), asyncValidator)
-    }
-
-    def foldAsync[R](
+    def bindAndFoldAsync[R](
         hasErrors: Form[T] => Future[R],
         success: T => Future[R]
-    )(implicit ec: ExecutionContext): Future[R] = {
-      form.fold(
-        formWithErrors => hasErrors(formWithErrors),
-        formModel =>
-          asyncValidator(form, formModel).flatMap {
-            case formWithErrors if formWithErrors.hasErrors =>
-              hasErrors(formWithErrors)
-            case _ =>
-              success(formModel)
-          }
-      )
+    )(implicit request: Request[_], ec: ExecutionContext): Future[R] = {
+      val boundForm = bindFromRequest()
+      boundForm
+        .fold(
+          formWithErrors => hasErrors(formWithErrors),
+          formModel =>
+            asyncValidator(formModel)
+              .foldLeft(Future.successful(Map.empty[String, String])) {
+                case (validationsFuture, (field, validation)) =>
+                  validationsFuture
+                    .flatMap { validations =>
+                      validation
+                        .map {
+                          case Some(error) =>
+                            validations + (field -> error)
+                          case None =>
+                            validations
+                        }
+                    }
+              }
+              .map { fieldErrorMap =>
+                fieldErrorMap.map {
+                  case (field, error) =>
+                    FormError(
+                      field,
+                      error
+                    )
+                }
+              }
+              .map {
+                case asyncErrors if asyncErrors.nonEmpty =>
+                  boundForm.copy(errors = asyncErrors.toSeq)
+                case _ =>
+                  boundForm
+              }
+              .flatMap {
+                case formWithErrors if formWithErrors.hasErrors =>
+                  hasErrors(formWithErrors)
+                case _ =>
+                  success(formModel)
+              }
+        )
     }
   }
 }

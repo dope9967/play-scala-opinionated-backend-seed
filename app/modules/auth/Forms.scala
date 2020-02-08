@@ -6,10 +6,10 @@ import java.util.UUID
 import javax.inject.Inject
 import modules.auth.Forms._
 import modules.user.{Role, User, UserRepository}
-import modules.utility.FormValidators
 import play.api.data.{Form, FormError}
 import play.api.data.Forms._
 import modules.utility.form.FormUtilities._
+import modules.utility.form.FormValidators
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,7 +25,7 @@ class Forms @Inject() (
     )(LoginFormModel.apply)(LoginFormModel.unapply)
   )
 
-  val signUpForm = Form(
+  val signUpForm = new Form(
     mapping(
       "username"         -> nonEmptyText,
       "email"            -> email,
@@ -33,48 +33,69 @@ class Forms @Inject() (
       "password-confirm" -> nonEmptyText
     )((username, email, password, _) => SignUpFormModel(username, email, password))(sufm =>
       Some(sufm.username, sufm.email, sufm.password, "")
-    )
-  ).withAsyncValidator { (form, model) =>
-    Future
-      .sequence(
-        Seq(
-          {
-            userRepository
-              .findByUsername(model.username)
-              .map {
-                case Some(_) =>
-                  Some("username" -> "validation.error.username.unique")
-                case _ =>
-                  None
-              }
-          }, {
-            userRepository
-              .findByEmail(model.email)
-              .map {
-                case Some(_) =>
-                  Some("email" -> "validation.error.email.unique")
-                case _ =>
-                  None
-              }
-          }
-        )
-      )
-      .map(_.flatten)
-      .map {
-        case asyncErrors if asyncErrors.nonEmpty =>
-          form.copy(
-            errors = asyncErrors.map {
-              case (key, error) =>
-                FormError(
-                  key,
-                  error
-                )
+    ),
+    Map.empty,
+    Seq.empty,
+    None
+  ) with WithAsyncValidator[SignUpFormModel] {
+
+    override def asyncValidator(
+        value: SignUpFormModel
+    )(implicit ec: ExecutionContext): Map[String, Future[Option[String]]] = {
+      Map(
+        "username" -> {
+          userRepository
+            .findByUsername(value.username)
+            .map {
+              case Some(_) =>
+                Some("validation.error.username.unique")
+              case _ =>
+                None
             }
-          )
-        case _ =>
-          form
-      }
+        },
+        "email" -> {
+          userRepository
+            .findByEmail(value.email)
+            .map {
+              case Some(_) =>
+                Some("validation.error.email.unique")
+              case _ =>
+                None
+            }
+        }
+      )
+    }
   }
+
+//  .withAsyncValidator { (_, model) =>
+//    val validations: Map[String, Future[Option[String]]] = Map(
+//      "username" -> {
+//        userRepository
+//          .findByUsername(model.username)
+//          .map {
+//            case Some(_) =>
+//              Some("validation.error.username.unique")
+//            case _ =>
+//              None
+//          }
+//      },
+//      "email" -> {
+//        userRepository
+//          .findByEmail(model.email)
+//          .map {
+//            case Some(_) =>
+//              Some("validation.error.email.unique")
+//            case _ =>
+//              None
+//          }
+//      }
+//    )
+//
+//    val transformedValidations: Future[Map[String, String]] =
+//      validations
+//
+//    transformedValidations
+//  }
 }
 
 object Forms {
