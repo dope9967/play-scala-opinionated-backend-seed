@@ -7,20 +7,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 object FormUtilities {
 
-  trait WithAsyncValidator[T] extends Form[T] {
+  case class FormWithExtensions[T](
+      form: Form[T],
+      asyncValidator: (T, ExecutionContext) => Map[String, Future[Option[String]]]
+  ) {
 
-    def asyncValidator(value: T)(implicit ec: ExecutionContext): Map[String, Future[Option[String]]]
+    def bindFromRequest()(implicit request: play.api.mvc.Request[_]): FormWithExtensions[T] = {
+      copy(form.bindFromRequest())
+    }
 
-    def bindAndFoldAsync[R](
+    def foldAsync[R](
         hasErrors: Form[T] => Future[R],
         success: T => Future[R]
     )(implicit request: Request[_], ec: ExecutionContext): Future[R] = {
-      val boundForm = bindFromRequest()
-      boundForm
+      form
         .fold(
           formWithErrors => hasErrors(formWithErrors),
           formModel =>
-            asyncValidator(formModel)
+            asyncValidator(formModel, ec)
               .foldLeft(Future.successful(Map.empty[String, String])) {
                 case (validationsFuture, (field, validation)) =>
                   validationsFuture
@@ -45,9 +49,9 @@ object FormUtilities {
               }
               .map {
                 case asyncErrors if asyncErrors.nonEmpty =>
-                  boundForm.copy(errors = asyncErrors.toSeq)
+                  form.copy(errors = asyncErrors.toSeq)
                 case _ =>
-                  boundForm
+                  form
               }
               .flatMap {
                 case formWithErrors if formWithErrors.hasErrors =>
