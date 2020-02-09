@@ -1,4 +1,4 @@
-name := """play-scala-opinionated-backend-seed"""
+name := """play-scala-seed"""
 
 version := "1.0.0"
 

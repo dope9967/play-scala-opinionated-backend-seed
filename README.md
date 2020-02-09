@@ -1,6 +1,6 @@
-# play-scala-opinionated-backend-seed
+# play-scala-seed
 
-Play Scala seed with opinionated backend:
+Play Scala seed with following dependencies:
 
 * [slick-pg](https://github.com/tminglei/slick-pg) with PostgreSQL for database
 * [play-silhouette](https://github.com/mohiva/play-silhouette) for authentication
