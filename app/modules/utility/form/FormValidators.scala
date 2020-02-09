@@ -1,4 +1,4 @@
-package modules.utility
+package modules.utility.form
 
 import play.api.data.FormError
 import play.api.data.format.Formatter

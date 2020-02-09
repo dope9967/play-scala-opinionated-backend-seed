@@ -84,6 +84,12 @@ class UserRepositoryImpl @Inject() (
     db.run(query.result.headOption)
   }
 
+  override def findByUsername(username: String): Future[Option[User]] = {
+    val query = userTable
+      .filter(_.username === username)
+    db.run(query.result.headOption)
+  }
+
   override def add(user: User): Future[User] = {
     val query = (userTable returning userTable) += user
     db.run(query)
