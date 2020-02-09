@@ -1,10 +1,10 @@
 package modules.auth
 
-import com.mohiva.play.silhouette.api.{LoginEvent, LoginInfo, LogoutEvent, SignUpEvent, Silhouette}
 import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Credentials, PasswordHasherRegistry}
+import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.{
   CommonSocialProfileBuilder,
   CredentialsProvider,
@@ -15,16 +15,7 @@ import javax.inject.Inject
 import modules.user.UserRepository
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.mvc.{
-  AbstractController,
-  Action,
-  AnyContent,
-  ControllerComponents,
-  MessagesAbstractController,
-  MessagesControllerComponents,
-  Request
-}
-import views.html
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -101,19 +92,18 @@ class AuthController @Inject() (
 
   def signUpView: Action[AnyContent] = silhouette.UnsecuredAction {
     implicit request: Request[AnyContent] =>
-      Ok(views.html.signup(forms.signUpForm))
+      Ok(views.html.signup(forms.signUpForm.form))
   }
 
   def signUp(): Action[AnyContent] = silhouette.UnsecuredAction.async {
     implicit request: Request[AnyContent] =>
       forms.signUpForm
         .bindFromRequest()
-        .fold(
+        .foldAsync(
           formWithErrors => {
             Future.successful(BadRequest(views.html.signup(formWithErrors)))
           },
           formModel => {
-            //TODO needs
             //TODO needs more fault tolerance
             val user = formModel.produceUser()
             for {

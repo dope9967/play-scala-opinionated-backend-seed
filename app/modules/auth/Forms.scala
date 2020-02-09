@@ -6,13 +6,17 @@ import java.util.UUID
 import javax.inject.Inject
 import modules.auth.Forms._
 import modules.user.{Role, User, UserRepository}
-import modules.utility.FormValidators
+import modules.utility.form.FormUtilities._
+import modules.utility.form.FormValidators
 import play.api.data.Form
 import play.api.data.Forms._
 
+import scala.concurrent.ExecutionContext
+
 class Forms @Inject() (
     userRepository: UserRepository
-) extends FormValidators {
+)(implicit ec: ExecutionContext)
+    extends FormValidators {
 
   val loginForm = Form(
     mapping(
@@ -21,25 +25,42 @@ class Forms @Inject() (
     )(LoginFormModel.apply)(LoginFormModel.unapply)
   )
 
-  val signUpForm = Form(
-    mapping(
-      "username" -> nonEmptyText,
-      //TODO implement proper async forms extension
-//      .verifying(
-//        "validation.error.username.unique",
-//        value => Await.result(userRepository.checkUsernameUnique(value), 10.seconds)
-//      )
-      "email" -> email,
-      //TODO implement proper async forms extension
-//      .verifying(
-//        "validation.error.email.unique",
-//        value => Await.result(userRepository.checkUsernameUnique(value), 10.seconds)
-//      )
-      "password"         -> of(passwordFormatterWithValidator),
-      "password-confirm" -> nonEmptyText
-    )((username, email, password, _) => SignUpFormModel(username, email, password))(sufm =>
-      Some(sufm.username, sufm.email, sufm.password, "")
-    )
+  val signUpForm = FormWithExtensions[SignUpFormModel](
+    form = Form(
+      mapping(
+        "username"         -> nonEmptyText,
+        "email"            -> email,
+        "password"         -> of(passwordFormatterWithValidator),
+        "password-confirm" -> nonEmptyText
+      )((username, email, password, _) => SignUpFormModel(username, email, password))(sufm =>
+        Some(sufm.username, sufm.email, sufm.password, "")
+      )
+    ),
+    asyncValidator = (value, ec) => {
+      implicit val implicitEc: ExecutionContext = ec
+      Map(
+        "username" -> {
+          userRepository
+            .findByUsername(value.username)
+            .map {
+              case Some(_) =>
+                Some("validation.error.username.unique")
+              case _ =>
+                None
+            }
+        },
+        "email" -> {
+          userRepository
+            .findByEmail(value.email)
+            .map {
+              case Some(_) =>
+                Some("validation.error.email.unique")
+              case _ =>
+                None
+            }
+        }
+      )
+    }
   )
 }
 
