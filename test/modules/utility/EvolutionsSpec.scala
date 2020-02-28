@@ -1,29 +1,37 @@
 package modules.utility
 
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, TestData, WordSpec}
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.db.DBApi
 import utility.application.TestApplications.basicDatabaseTestApplication
 import utility.database.PlayPostgreSQLTest
 
-class EvolutionsSpec extends WordSpec with PlayPostgreSQLTest {
+class EvolutionsSpec
+    extends WordSpec
+    with GuiceOneAppPerTest
+    with PlayPostgreSQLTest
+    with Matchers {
 
-  override implicit def app: Application =
+  override def newAppForTest(testData: TestData): Application = {
     basicDatabaseTestApplication(container, evolutionsEnabled = false)
+  }
 
   "Evolutions" when {
+    "bound" should {
+      "bind database API as singleton" in {
+        val api1 = app.injector.instanceOf[DBApi]
+        val api2 = app.injector.instanceOf[DBApi]
+
+        api1 shouldEqual api2
+      }
+    }
+
     "ran" should {
       "apply and unapply properly" in {
-        lazy val databaseApi = app.injector.instanceOf[DBApi]
-        val database         = databaseApi.database("default")
+        applyEvolutions()
 
-        applyEvolutions(database)
-
-        unapplyEvolutions(database)
-
-        applyEvolutions(database)
-
-        unapplyEvolutions(database)
+        unapplyEvolutions()
       }
     }
   }

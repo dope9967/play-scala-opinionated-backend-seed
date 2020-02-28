@@ -24,6 +24,8 @@ object TestApplications {
       ).flatten.toMap
     )
 
+    //TODO add Silhouette test bindings
+
     GuiceApplicationBuilder(configuration = configuration)
       .in(Mode.Test)
       .build()
