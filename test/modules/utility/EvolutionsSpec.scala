@@ -32,6 +32,10 @@ class EvolutionsSpec
         applyEvolutions()
 
         unapplyEvolutions()
+
+        applyEvolutions()
+
+        unapplyEvolutions()
       }
     }
   }
